@@ -53,7 +53,6 @@ def get_sales_list(sales_link):
     deals_url = []
     pages = get_last_page(sales_link)
     for page in range(1, pages):
-        print("################ Processing " + str(page) + " page ####################")
         deals_souped = get_souped_page(sales_link + "&page=" + str(page))
         deals = deals_souped.find_all("a", {"class": "search_result_row"})
         for deal in deals:
@@ -86,8 +85,9 @@ def add_duplicate(link):
     add_to.write("%s\n" % link)
     add_to.close()
 
-list_new = get_sales_list(STEAM_DEALS_URL)
+t = Twitter(auth=OAuth(OAUTH_TOKEN, OAUTH_SECRET, CONSUMER_KEY, CONSUMER_SECRET))
 
+list_new = get_sales_list(STEAM_DEALS_URL)
 save_sales_list(list_new)
 list_old = load_sales_list()
 
@@ -95,7 +95,7 @@ messages_list = diff_new_old(list_new, list_old)
 
 for message in messages_list:
     try:
-        print(make_message(message))
+        t.statuses.update(status=make_message(message))
     except AttributeError:
         e = 1
     except TwitterHTTPError:
@@ -103,3 +103,4 @@ for message in messages_list:
 
 os.remove("list")
 os.rename("list_new", "list")
+print("Done!")
