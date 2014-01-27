@@ -13,7 +13,6 @@ from twitter import *
 from bs4 import BeautifulSoup
 import urllib.request
 import os
-import datetime
 
 
 def get_last_page(sales_link):
@@ -27,7 +26,9 @@ def get_last_page(sales_link):
 
 def get_souped_page(page_url):
     try:
-        f = urllib.request.urlopen(page_url)
+        req = urllib.request.Request(page_url)
+        req.add_header("Cookie", "birthtime=662688000;")
+        f = urllib.request.urlopen(req)
         return BeautifulSoup(f.read().decode("utf-8"))
     except urllib.request.HTTPError:
         print("HTTP error")
@@ -56,7 +57,7 @@ def get_sales_list(sales_link):
         deals_souped = get_souped_page(sales_link + "&page=" + str(page))
         deals = deals_souped.find_all("a", {"class": "search_result_row"})
         for deal in deals:
-            deals_url.append(deal["href"][:deal["href"].index('?')])
+            deals_url.append(deal["href"][:deal["href"].index('?')].replace("steamgames", "steampowered"))
     return deals_url
 
 
@@ -95,6 +96,7 @@ messages_list = diff_new_old(list_new, list_old)
 
 for message in messages_list:
     try:
+        # print(make_message(message))
         t.statuses.update(status=make_message(message))
     except AttributeError:
         e = 1
