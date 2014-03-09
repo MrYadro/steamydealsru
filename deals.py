@@ -13,6 +13,7 @@ from twitter import *
 from bs4 import BeautifulSoup
 import urllib.request
 import os
+import re
 
 
 def get_last_page(sales_link):
@@ -57,7 +58,7 @@ def get_sales_list(sales_link):
         deals_souped = get_souped_page(sales_link + "&page=" + str(page))
         deals = deals_souped.find_all("a", {"class": "search_result_row"})
         for deal in deals:
-            deals_url.append(deal["href"][:deal["href"].index('?')].replace("steamgames", "steampowered"))
+            deals_url.append("http://store.steampowered.com/app/" + re.findall("\d+", deal["href"])[0] + "/")
     return deals_url
 
 
